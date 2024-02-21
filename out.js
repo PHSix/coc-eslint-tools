@@ -6661,56 +6661,6 @@ var PatternItem;
   }
   PatternItem2.is = is;
 })(PatternItem || (PatternItem = {}));
-var CodeActionsOnSave;
-((CodeActionsOnSave2) => {
-  function isExplicitlyDisabled(setting) {
-    if (setting === void 0 || setting === null || Array.isArray(setting)) {
-      return false;
-    }
-    return setting["source.fixAll.eslint"] === false;
-  }
-  CodeActionsOnSave2.isExplicitlyDisabled = isExplicitlyDisabled;
-  function getSourceFixAll(setting) {
-    if (setting === null) {
-      return void 0;
-    }
-    if (Array.isArray(setting)) {
-      return setting.includes("source.fixAll") ? true : void 0;
-    } else {
-      return setting["source.fixAll"];
-    }
-  }
-  CodeActionsOnSave2.getSourceFixAll = getSourceFixAll;
-  function getSourceFixAllESLint(setting) {
-    if (setting === null) {
-      return void 0;
-    } else if (Array.isArray(setting)) {
-      return setting.includes("source.fixAll.eslint") ? true : void 0;
-    } else {
-      return setting["source.fixAll.eslint"];
-    }
-  }
-  CodeActionsOnSave2.getSourceFixAllESLint = getSourceFixAllESLint;
-  function setSourceFixAllESLint(setting, value) {
-    if (setting === null) {
-      return;
-    } else if (Array.isArray(setting)) {
-      const index = setting.indexOf("source.fixAll.eslint");
-      if (value === true) {
-        if (index === -1) {
-          setting.push("source.fixAll.eslint");
-        }
-      } else {
-        if (index >= 0) {
-          setting.splice(index, 1);
-        }
-      }
-    } else {
-      setting["source.fixAll.eslint"] = value;
-    }
-  }
-  CodeActionsOnSave2.setSourceFixAllESLint = setSourceFixAllESLint;
-})(CodeActionsOnSave || (CodeActionsOnSave = {}));
 
 // src/shared/customMessages.ts
 var import_vscode_languageserver_protocol = __toESM(require_main3());
@@ -6831,13 +6781,13 @@ var ESLintClient;
         }
       }
     }));
-    client2.onNotification(ShowOutputChannel.method, () => {
+    client2.onNotification(ShowOutputChannel.type.method, () => {
       client2.outputChannel.show();
     });
-    client2.onNotification(StatusNotification.method, (params) => {
+    client2.onNotification(StatusNotification.type.method, (params) => {
       updateDocumentStatus(params);
     });
-    client2.onNotification(ExitCalled.method, (params) => {
+    client2.onNotification(ExitCalled.type.method, (params) => {
       serverCalledProcessExit = true;
       client2.error(`Server process exited with code ${params[0]}. This usually indicates a misconfigured ESLint setup.`, params[1]);
       void import_coc.window.showErrorMessage(`ESLint server shut down itself. See 'ESLint' output channel for details.`, { title: "Open Output", id: 1 }).then((value) => {
@@ -6846,7 +6796,7 @@ var ESLintClient;
         }
       });
     });
-    client2.onRequest(NoConfigRequest.method, (params) => {
+    client2.onRequest(NoConfigRequest.type.method, (params) => {
       const document = import_coc.Uri.parse(params.document.uri);
       const workspaceFolder = import_coc.workspace.getWorkspaceFolder(document.fsPath);
       const fileLocation = document.fsPath;
@@ -6867,7 +6817,7 @@ var ESLintClient;
       updateDocumentStatus({ uri: params.document.uri, state: 3 /* error */ });
       return {};
     });
-    client2.onRequest(NoESLintLibraryRequest.method, async (params) => {
+    client2.onRequest(NoESLintLibraryRequest.type.method, async (params) => {
       const key = "noESLintMessageShown";
       const state = context.globalState.get(key, {});
       const uri = import_coc.Uri.parse(params.source.uri);
@@ -7163,7 +7113,7 @@ var ESLintClient;
           quiet: config.get("quiet", false),
           onIgnoredFiles: ESLintSeverity.from(config.get("onIgnoredFiles", "off" /* off */)),
           options: config.get("options", {}),
-          rulesCustomizations: getRuleCustomizations(config, resource),
+          rulesCustomizations: getRuleCustomizations(config),
           run: config.get("run", "onType"),
           problems: {
             shortenToSingleLine: config.get("problems.shortenToSingleLine", false)
@@ -7285,11 +7235,8 @@ var ESLintClient;
         return void 0;
       }).filter((value) => !!value);
     }
-    function getRuleCustomizations(config, uri) {
+    function getRuleCustomizations(config) {
       let customizations = void 0;
-      if (uri.scheme === "vscode-notebook-cell") {
-        customizations = config.get("notebooks.rules.customizations", void 0);
-      }
       if (customizations === void 0 || customizations === null) {
         customizations = config.get("rules.customizations");
       }

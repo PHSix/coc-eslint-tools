@@ -142,25 +142,25 @@ export namespace ESLintClient {
 			}
 		}));
 
-		client.onNotification(ShowOutputChannel.method, () => {
+		client.onNotification(ShowOutputChannel.type.method, () => {
 			client.outputChannel.show();
 		});
 
-		client.onNotification(StatusNotification.method, (params) => {
+		client.onNotification(StatusNotification.type.method, (params) => {
 			updateDocumentStatus(params);
 		});
 
-		client.onNotification(ExitCalled.method, (params) => {
+		client.onNotification(ExitCalled.type.method, (params) => {
 			serverCalledProcessExit = true;
 			client.error(`Server process exited with code ${params[0]}. This usually indicates a misconfigured ESLint setup.`, params[1]);
-			void Window.showErrorMessage(`ESLint server shut down itself. See 'ESLint' output channel for details.`, { title: 'Open Output', id: 1}).then((value) => {
+			void Window.showErrorMessage(`ESLint server shut down itself. See 'ESLint' output channel for details.`, { title: 'Open Output', id: 1 }).then((value) => {
 				if (value !== undefined && value.id === 1) {
 					client.outputChannel.show();
 				}
 			});
 		});
 
-		client.onRequest(NoConfigRequest.method, (params) => {
+		client.onRequest(NoConfigRequest.type.method, (params) => {
 			const document = Uri.parse(params.document.uri);
 			const workspaceFolder = Workspace.getWorkspaceFolder(document.fsPath);
 			const fileLocation = document.fsPath;
@@ -183,7 +183,7 @@ export namespace ESLintClient {
 			return {};
 		});
 
-		client.onRequest(NoESLintLibraryRequest.method, async (params) => {
+		client.onRequest(NoESLintLibraryRequest.type.method, async (params) => {
 			const key = 'noESLintMessageShown';
 			const state = context.globalState.get<NoESLintState>(key, {});
 
