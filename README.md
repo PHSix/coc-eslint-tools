@@ -11,7 +11,7 @@ Forked from [vscode-eslint](https://github.com/Microsoft/vscode-eslint) and insp
 In your vim/neovim run the following command:
 
 ```viml
-:CocInstall coc-eslint-tools
+Plug 'PHSix/coc-eslint-tools'
 ```
 
 ## Features
